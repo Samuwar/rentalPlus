@@ -1,0 +1,37 @@
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: rentalplus-mongo
+    ports:
+      - "40017:27017"
+    volumes:
+      - ./data/db2:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - rentalplus-network
+
+  backend:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: rentalplus-backend:1.0
+    container_name: rentalplus-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET_KEY}
+    depends_on:
+      - mongodb
+    networks:
+      - rentalplus-network
+
+networks:
+  rentalplus-network:
+    driver: bridge
+
+
